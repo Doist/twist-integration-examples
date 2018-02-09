@@ -49,7 +49,6 @@ app.listen(process.env.PORT || 3000, () =>
   console.log(`Server listening on port ${process.env.PORT || 3000}`),
 )
 ```
-
 ### Nodemon
 We can then run our Node application using `nodemon`. This means any changes to our JavaScript will restart our Node server, allowing for a much smoother development experience:
 
@@ -63,14 +62,12 @@ $ nodemon server.js
 
 We can then define a new route that our Webhook will point at:
 
-
 ```javascript
 app.post('/appear', (req, res) => {
   console.log(req)
 });
 ```
 We'll need to expose our application and create an integration based on user events. This means we'll need to use `ngrok` and create an integration over at [Twist](https://twistapp.com).
-
 
 # Twist Integration
 ## Create a New Integration
