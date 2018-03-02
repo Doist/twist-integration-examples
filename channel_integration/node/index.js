@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const app = express();
 const TWIST_URL =
-  'https://twistapp.com/api/v2/integration_incoming/post_data?install_id=42746&install_token=42746_80f6f59f724881069af9930c782791ac';
+  'https://twistapp.com/api/v2/integration_incoming/post_data?install_id=1234&install_token=01234_56a7b89c012345678de9012f345678ab';
 
 app.use(bodyParser.json());
 app.use(
