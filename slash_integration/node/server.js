@@ -11,7 +11,6 @@ app.use(
 );
 
 app.post('/appear', (req, res) => {
-  console.log(req);
   const body = req.body;
   const roomName = body.command_argument;
 

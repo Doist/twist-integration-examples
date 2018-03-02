@@ -1,7 +1,7 @@
 # Slash Integration with Node and Express
 
 ## Prerequisites
-You'll need to ensure that [Node.js](https://node.js) is installed on your machine and downloading the latest LTS/Current version or by using [Homebrew](https://brew.sh)/[Chocolatey](https://chocolatey.org).
+You'll need to ensure that [Node.js](https://node.js) is installed on your machine and you can download the latest LTS/Current version or by using [Homebrew](https://brew.sh)/[Chocolatey](https://chocolatey.org).
 
 We'll also be using ngrok (https://ngrok.com/) for this project. You can elect to install this via `npm` or by other methods.
 
@@ -24,12 +24,12 @@ $ npm init -y
 $ touch server.js
 
 # Install the required dependencies
-$ npm install express body-parser axios --save
+$ npm install express body-parser --save
 ```
 
 ## Server Setup
 
-We can set up a listen server with Express:
+We can then set up a listen server with Express:
 
 ```javascript
 const express = require('express');
@@ -50,7 +50,7 @@ app.listen(process.env.PORT || 3000, () =>
 )
 ```
 ### Nodemon
-We can then run our Node application using `nodemon`. This means any changes to our JavaScript will restart our Node server, allowing for a much smoother development experience:
+At this point, we can run our Node application using `nodemon`. This means any changes to our JavaScript will restart our Node server, allowing for a much smoother development experience:
 
 ```bash
 # Install nodemon globally
@@ -60,13 +60,14 @@ $ npm install nodemon -g
 $ nodemon server.js
 ```
 
-We can then define a new route that our Webhook will point at:
+Next, we'll define a new route that our webhook will point at:
 
 ```javascript
 app.post('/appear', (req, res) => {
   console.log(req)
 });
 ```
+
 We'll need to expose our application and create an integration based on user events. This means we'll need to use `ngrok` and create an integration over at [Twist](https://twistapp.com).
 
 # Twist Integration
@@ -94,7 +95,7 @@ This allows us to create a new Integration that can listen for slashes when inst
 On the integration overview screen we can create a **Slash command** that can be used to invoke this integration. As our example involves [appear.in](https://appear.in), we can give this the command of `/appear`.
 
 ## Exposing a URL
-We now have an application on Twist but no exposed URL, for this we'll use `ngrok`. There are numerous ways to install `ngrok`, but perhaps the easiest for Node environments is via `npm`:
+We now have an application on Twist but no exposed URL, for this we'll use `ngrok`. There are numerous ways to install `ngrok`, but perhaps the easiest for Node environments is via `npm`.
 
 ### Install `ngrok` globally
 
