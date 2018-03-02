@@ -10,15 +10,15 @@ Examples
 ## Channel Integration
 
 ### Python
-* Coming soon
+* [GitHub issue -> Twist thread](channel_integration/python/)
 
 ### Node
-* [GitHub issue -> Twist thread channel integration](channel_integration/node/)
+* [GitHub issue -> Twist thread](channel_integration/node/)
 
 ## Slash Integration
 
 ### Python
-* [Slash integration with Python](slash_integration/python/)
+* [Appear.in slash integration](slash_integration/python/)
 
 ### Node
-* [Slash integration with Node](slash_integration/node/)
+* [Appear.in slash integration](slash_integration/node/)
