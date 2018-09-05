@@ -15,6 +15,9 @@ Examples
 ### Node
 * [GitHub issue -> Twist thread](channel_integration/node/)
 
+### Go
+* [GitHub issue -> Twist thread](channel_integration/go/)
+
 ## Slash Integration
 
 ### Python
@@ -22,3 +25,6 @@ Examples
 
 ### Node
 * [Appear.in slash integration](slash_integration/node/)
+
+### Go
+* [Appear.in slash integration](slash_integration/go/)
