@@ -1,4 +1,4 @@
-from requests import get
+from requests import get, post
 from datetime import timedelta, datetime
 from twist_model import workspaceIdParamName, archivedParamName, idParamName, channelIdParamName, closedParamName, creatorParamName, lastUpdatedParamName
 
@@ -7,6 +7,7 @@ twistToken = '!!!Paste OAuth2 test token here!!!'
 twistApiUrlBase = 'https://twist.com/api/v3/'
 channelsUrl = 'channels/get'
 threadsUrl = 'threads/get'
+unfollowUrl = 'threads/unfollow'
 
 authHeaders = {
         'Authorization': 'Bearer ' + twistToken
@@ -42,6 +43,15 @@ def getStaleThreadsForUser(userId, channelId, minLastResponseDaysOffset, maxLast
         in openThreadsForUser
         if not isThreadStale(thread, minLastResponseDaysOffset, maxLastResponseDaysOffset)]
 
+def unfollowThread(threadId):
+    params = {
+        idParamName: threadId
+    }
+
+    result = postWithAuthorization(unfollowUrl, params)
+    return result
+
+
 # Filters threads to the ones that have not been active for more than 3 days, but less than 21 days.
 def isThreadStale(thread, minLastResponseDaysOffset, maxLastResponseDaysOffset):
     minDate = (datetime.today() - timedelta(days=maxLastResponseDaysOffset)).timestamp()
@@ -58,3 +68,8 @@ def getWithAuthorization(relativeUrl, params):
     absoluteUrl = twistApiUrlBase + relativeUrl
 
     return get(absoluteUrl, params=params, headers=authHeaders).json()
+
+def postWithAuthorization(relativeUrl, params):
+    absoluteUrl = twistApiUrlBase + relativeUrl
+
+    return post(absoluteUrl, params=params, headers=authHeaders).json()

@@ -3,7 +3,14 @@ from twist_model import titleParamName, workspaceIdParamName, channelIdParamName
 
 startingWorkerMessage = 'Looking for your threads. This will take a couple of secs. ⏳'
 noStaleThreadsMessage = 'You have no stale threads, congrats!'
-unknownCommandMessage = 'Unknown command, try `stale threads`. For this command, the bot will look open threads that you created that are still open, but have not been active for the last three days. Dead threads that have been inactive for more than three weeks are not displayed for brewity.'
+unfollowedMessage = 'I have unfollowed the thread for you. If it stressed you out for some reason, consider taking a minute for a [breathing exercise](https://greatist.com/happiness/breathing-exercises-relax#5.-4-7-8-Breathing-or-relaxing-breath), it might help you de-stress a bit.'
+cannotUnfollowMessage = 'Can\'t be done. Make sure your command looks like `unfollow https://twist.com/a/1585/ch/140545/t/1335288/`.'
+unknownCommandMessage = 'Unknown command, try typing `help` to see where can I begrudgingly help.'
+genericHelpMessage = ('Heya. 👋 \r\n\r\n I\'m Maassi, your mildly annoyed assistant. My goal is to provide you with tools to manage the chaos around you.\r\n' +
+    '* `unfollow [thread URL]` - I will remove you from the default recepient group. Sometimes people can be a bit too much.\r\n' +
+    '* `stale threads` - If you\'re using the [close a thread](https://get.twist.help/hc/en-us/articles/360006299539-Close-a-thread) feature consistently, I will hunt down the loose threads.\r\n' +
+    '* `help` - See what I can do for you.')
+
 
 # Outputs a string similar to "[Weekly Snippets](https://twist.com/a/1585/ch/275039/t/1256437/) last updated on Thursday, February 06"
 def formatStaleThreadString(thread):

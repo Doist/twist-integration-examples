@@ -2,11 +2,16 @@ from flask import Flask, request, jsonify
 from redis import Redis
 from rq import Queue
 
-from twist_model import workspaceIdParamName, userIdParamName, urlCallbackParamName, contentParameterName
-from commands.stale_threads import getStaleThreads
-from output_formatting import startingWorkerMessage, unknownCommandMessage
-from command_processing import processInput
 from model import CommandType, CommandPayload
+
+from commands.stale_threads import getStaleThreads
+from commands.unfollow import unfollow
+from commands.help import help
+
+from twist_model import workspaceIdParamName, userIdParamName, urlCallbackParamName, contentParameterName
+from output_formatting import startingWorkerMessage, unknownCommandMessage, cannotUnfollowMessage, unfollowedMessage
+from command_processing import processInput
+
 
 app = Flask(__name__)
 
@@ -28,13 +33,26 @@ def processUnrecognized(commandPayload):
 
         
 def processUnfollow(commandPayload):
+    canUnfollow = unfollow(commandPayload.commandParameter)
+
+    if canUnfollow:
+        return jsonify({
+            contentParameterName: unfollowedMessage
+        })
+    else:
+        return jsonify({
+            contentParameterName: cannotUnfollowMessage
+        })
+
+def processHelp(commandPayload):
     return jsonify({
-            contentParameterName: unknownCommandMessage
+            contentParameterName: help()
         })
 
 commands = {
     CommandType.STALE_THREADS: processStaleThreads,
     CommandType.UNFOLLOW: processUnfollow,
+    CommandType.HELP: processHelp,
     CommandType.UNRECOGNIZED: processUnrecognized
 }
 
@@ -47,10 +65,11 @@ def process():
     urlCallback = requestDeserialized[urlCallbackParamName]
     content = requestDeserialized[contentParameterName]
 
-    commandParseResult = processInput(content)
+    try:
+        commandParseResult = processInput(content)
 
-    result = commands[commandParseResult.commandType](
-        CommandPayload(commandParseResult.commandType, workspaceId, userId, urlCallback)
-    )
-
-    return result
+        return commands[commandParseResult.commandType](
+            CommandPayload(commandParseResult.commandParameter, workspaceId, userId, urlCallback)
+        )
+    except:
+        return commands[CommandType.HELP](None)

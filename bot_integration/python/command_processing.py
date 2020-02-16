@@ -6,4 +6,4 @@ def processInput(input):
     if len(matchingCommands) == 0:
         return CommandParseResult(CommandType.UNRECOGNIZED, input)
 
-    return CommandParseResult(matchingCommands[0], input[len(matchingCommands[0].value):].strip())
+    return CommandParseResult(matchingCommands[0], input[len(matchingCommands[0].value[0]):].strip())
