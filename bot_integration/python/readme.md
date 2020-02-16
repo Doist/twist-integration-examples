@@ -12,11 +12,11 @@ When Twist calls the `/stale-threads` endpoint, a Flask app receives the message
 You will need Python 3.x to run this sample. [Ngrok](https://ngrok.com/) is also used to ease debugging. When running the application, three separate commands need to be run:
 1. Run `ngrok http 5000`. Mark the [HTTPS forward](https://share.getcloudapp.com/E0uEDvvy). Note it can change on every run.
 2. Run `flask run` to start the Flask web server
-3. Run `rq worker` to start the worker that the Flask web server hands of the requests to.
+3. Run `rq worker` to start the worker that the Flask web server hands of the requests to. (if you see a "Connection refused" message, Redis is most likely not running. See below for resolution)
 
 To install [Ngrok](https://ngrok.com/), you need to register and then install the binaries through the [setup & installation](https://dashboard.ngrok.com/get-started) steps.
 
-Ensure that Redis server is installed and it's running using `redis-cli ping` (you should see a `PONG` response).
+Ensure that Redis server is installed and it's running using `redis-cli ping` (you should see a `PONG` response). If you don't get a response, try running `sudo service redis-server start` on bash and ping again.
 
 In addition, you need to register your integration with Twist. You can do this [here](https://twist.com/integrations/build). Pick the General Integration type and write the name *Stale Threads*. After the integration is created, go to the *OAuth Authentication* section, copy the *OAuth2 test token* and paste it in `twist_api.py`. Then go to the *Bot* tab and set the *Outgoing webhook URL* to `https://[Ngrok HTTPS Forward URL]/stale-threads`, where the Ngrok URL is the one you saw when running `ngrok http 5000` earlier.
 
