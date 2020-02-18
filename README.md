@@ -28,3 +28,8 @@ Examples
 
 ### Go
 * [Appear.in slash integration](slash_integration/go/)
+
+## Bot Integration
+
+### Node
+* [Simple bot integration](bot_integration/node/)
