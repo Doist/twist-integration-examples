@@ -160,7 +160,7 @@ If we click the "Test ping URL" button once again, you'll notice that we can see
 
 So far, we've got ourselves a bot that _exists_, but doesn't say (or do) anything. We can choose to add functionality to our bot by first determining the type of communication. 
 
-The `event_type` response will be different depending on the context:
+The [`event_type`](https://developer.twist.com/v3/#outgoing-webhook-on-bot-activity) response will be different depending on the context:
 
 | Event type | Description |
 | ---------- | ----------- |
@@ -198,7 +198,7 @@ app.post('/bot', (req, res) => {
 });
 ```
 
-Similar to responding to the `ping` requests, we can take advantage of the `thread`, `comment`, and `message` event types to apply context to our bot. 
+Similar to responding to the `ping` requests, we can take advantage of the `thread`, `comment`, and `message` [event types](https://developer.twist.com/v3/#outgoing-webhook-on-bot-activity) to apply context to our bot. 
 
 Therefore, by responding to these events, our resulting actions become the following:
 
