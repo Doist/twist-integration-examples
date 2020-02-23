@@ -1,0 +1,28 @@
+default_language_version:
+    python: python3.6
+
+# default_stages: [prepare-commit-msg, commit, push]
+
+# The list of available plugins is available
+# at https://pre-commit.com/hooks.html
+#
+# Use the command "pre-commit autoupdate" to upgrade versions
+# of repos
+repos:
+
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+      - id: flake8
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: debug-statements
+
+-   repo: https://github.com/psf/black
+    rev: 19.10b0
+    hooks:
+    - id: black
+      language_version: python3.6

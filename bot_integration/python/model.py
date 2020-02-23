@@ -1,11 +1,17 @@
-from enum import Enum, auto
 from collections import namedtuple
+from enum import Enum
+
 
 class CommandType(Enum):
-    STALE_THREADS = 'stale threads'
-    UNFOLLOW = 'unfollow',
-    HELP = 'help'
-    UNRECOGNIZED = ''
+    STALE_THREADS = "stale threads"
+    UNFOLLOW = "unfollow"
+    HELP = "help"
+    UNRECOGNIZED = ""
 
-CommandParseResult = namedtuple('CommandParseResult', 'commandType commandParameter')
-CommandPayload = namedtuple('RequestPayload', 'commandParameter workspaceId userId urlCallback')
+
+ParseResult = namedtuple("ParseResult", "commandType commandParameter")
+
+
+CommandPayload = namedtuple(
+    "RequestPayload", "commandParameter workspaceId userId urlCallback"
+)
