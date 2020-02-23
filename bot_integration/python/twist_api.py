@@ -1,3 +1,4 @@
+from api_token import TWIST_TOKEN
 from datetime import datetime, timedelta
 
 from requests import get, post
@@ -11,14 +12,12 @@ from twist_model import (
     workspaceIdParamName,
 )
 
-twistToken = "!!!Paste OAuth2 test token here!!!"
-
 twistApiUrlBase = "https://twist.com/api/v3/"
 channelsUrl = "channels/get"
 threadsUrl = "threads/get"
 unfollowUrl = "threads/unfollow"
 
-authHeaders = {"Authorization": "Bearer " + twistToken}
+authHeaders = {"Authorization": "Bearer " + TWIST_TOKEN}
 
 
 # Gets all channels that the user is subscribed to

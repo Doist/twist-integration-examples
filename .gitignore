@@ -3,3 +3,4 @@ node_modules
 lib
 bin
 pyvenv.cfg
+bot_integration/python/api_token.py
