@@ -1,6 +1,6 @@
 # Stale Issues - Bot Integration with Twist
 
-This sample shows a simple integration with the [Bot](https://developer.twist.com/v3/#how-a-bot-works) endpoint of Twist. It receives a message, gets data from the Twist API and returns them back to the user. It demonstrates the following:
+This sample shows a simple integration with the [Bot](https://developer.twist.com/v3/#bot) endpoint of Twist. It receives a message, gets data from the Twist API and returns them back to the user. It demonstrates the following:
 * How to receive a request from Twist
 * How to access Twist APIs
 * How to execute an operation that takes more than 10 seconds, exceeding the Twist timeout limit
