@@ -18,13 +18,13 @@ const (
 	tokenURL     string = "https://twist.com/oauth/access_token"
 
 	// callback url specified when the application was defined
-	// NOTE: This url should *NOT* be localhost or the authorize call will fail
 	// eg. https://dev.twist.test:4567/v3/
 	callbackURL string = "<<enter the callback url for your application>>"
 
 	// e.g. https://api.twist.com/api/v3/workspaces/get
 	apiURL string = "<<enter the scopes your application requires>>"
 
+	// client (application) credentials - located at https://twist.com/integrations/build, then go to your integration
 	clientID     string = "<<client id>>"
 	clientSecret string = "<<client secret>>"
 )

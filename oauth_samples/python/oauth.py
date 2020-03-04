@@ -9,7 +9,6 @@ authorize_url = "https://twist.com/oauth/authorize"
 token_url = "https://twist.com/oauth/access_token"
 
 #callback url specified when the application was defined
-# NOTE: This url should *NOT* be localhost or the authorize call will fail
 callback_uri = "<<enter the callback url for your application>>" # e.g. http://dev.twist.test:4567/v3/
 
 api_url = "<<enter the url of the api endpoint you wish to access>>" # e.g. https://api.twist.com/api/v3/workspaces/get
