@@ -15,7 +15,7 @@ callback_uri = "<<enter the callback url for your application>>" # e.g. http://d
 api_url = "<<enter the url of the api endpoint you wish to access>>" # e.g. https://api.twist.com/api/v3/workspaces/get
 
 # Should be a comma separated list, see https://developer.twist.com/v3/#scopes for a full list
-scopes = "<<enter the scopes your application requires" # e.g. user:read,workspaces:read
+scopes = "<<enter the scopes your application requires>>" # e.g. user:read,workspaces:read
 
 # client (application) credentials - located at https://twist.com/integrations/build, then go to your integration
 client_id = '<<client id>>'
