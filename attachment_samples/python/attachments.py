@@ -1,11 +1,12 @@
 __author__ = "scott"
 
-import json
 import uuid
+import json
+import os
 
 import requests
 
-access_token = "oauth2:58f200c34730e95323ac3b9a8b878f0423ac36a9"
+access_token = os.environ.get("twist_token")
 
 workspace_id = 70829
 conversation_id = 494996
@@ -40,11 +41,9 @@ def upload_attachment():
     )
     f.close()
 
-    attachment = json.loads(response.text)
-
     # Return the JSON here as this will be needed
     # when adding the attachment to the message
-    return attachment
+    return response.json()
 
 
 def upload_attachment_to_conversation(message):
@@ -59,7 +58,7 @@ def upload_attachment_to_conversation(message):
     data = {
         "conversation_id": conversation_id,
         "content": message,
-        "attachments": [attachment],
+        "attachments": json.dumps([attachment]),
     }
 
     print(data)
