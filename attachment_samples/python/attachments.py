@@ -8,18 +8,18 @@ import requests
 
 # This access token will need to have "attachments:write, and either/both
 # messages:write,comments:write" (depending on your usage) scopes
-access_token = os.environ.get("twist_token")
+ACCESS_TOKEN = os.environ.get("twist_token")
 
-conversation_id = 494996
-thread_id = 1389541
+CONVERSATION_ID = "<<enter your conversation ID here>>"
+THREAD_ID = "<<enter your thread ID here>>"
 
-attachment_endpoint = "https://api.twist.com/api/v3/attachments/upload"
-add_conversation_message_endpoint = (
+ATTACHMENT_ENDPOINT = "https://api.twist.com/api/v3/attachments/upload"
+ADD_CONVERSATION_MESSAGE_ENDPOINT = (
     "https://api.twist.com/api/v3/conversation_messages/add"
 )
-add_comment_thread_endpoint = "https://api.twist.com/api/v3/comments/add"
+ADD_COMMENT_THREAD_ENDPOINT = "https://api.twist.com/api/v3/comments/add"
 
-headers = {"Authorization": "Bearer " + access_token}
+HEADERS = {"Authorization": "Bearer " + ACCESS_TOKEN}
 
 
 def upload_attachment():
@@ -38,7 +38,7 @@ def upload_attachment():
     }
 
     response = requests.post(
-        attachment_endpoint, data=data, files=files, headers=headers
+        ATTACHMENT_ENDPOINT, data=data, files=files, headers=HEADERS
     )
     f.close()
 
@@ -49,17 +49,17 @@ def upload_attachment():
 
 def upload_attachment_to_conversation(message):
     data = {
-        "conversation_id": conversation_id,
+        "conversation_id": CONVERSATION_ID,
     }
 
-    endpoint = add_conversation_message_endpoint
+    endpoint = ADD_CONVERSATION_MESSAGE_ENDPOINT
     _upload_attachment_send_message(message, data, endpoint)
 
 
 def upload_attachment_to_thread(message):
-    data = {"thread_id": thread_id}
+    data = {"thread_id": THREAD_ID}
 
-    endpoint = add_comment_thread_endpoint
+    endpoint = ADD_COMMENT_THREAD_ENDPOINT
     _upload_attachment_send_message(message, data, endpoint)
 
 
@@ -77,6 +77,6 @@ def _upload_attachment_send_message(message, data, api_endpoint):
     data["content"] = message
     data["attachments"] = json.dumps([attachment])
 
-    response = requests.post(api_endpoint, data=data, headers=headers)
+    response = requests.post(api_endpoint, data=data, headers=HEADERS)
 
     print(response.text)

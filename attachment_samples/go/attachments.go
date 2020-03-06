@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	conversationID = "494996"
-	threadID       = "1389541"
+	conversationID = "<<enter your conversation ID here>>"
+	threadID       = "<<enter your thread ID here>>"
 
 	attachmentEndpoint             = "https://api.twist.com/api/v3/attachments/upload"
 	addConversationMessageEndpoint = "https://api.twist.com/api/v3/conversation_messages/add"
