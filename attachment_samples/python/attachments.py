@@ -6,9 +6,10 @@ import os
 
 import requests
 
+# This access token will need to have "attachments:write, and either/both
+# messages:write,comments:write" (depending on your usage) scopes
 access_token = os.environ.get("twist_token")
 
-workspace_id = 70829
 conversation_id = 494996
 thread_id = 1389541
 
@@ -47,27 +48,35 @@ def upload_attachment():
 
 
 def upload_attachment_to_conversation(message):
+    data = {
+        "conversation_id": conversation_id,
+    }
+
+    endpoint = add_conversation_message_endpoint
+    _upload_attachment_send_message(message, data, endpoint)
+
+
+def upload_attachment_to_thread(message):
+    data = {"thread_id": thread_id}
+
+    endpoint = add_comment_thread_endpoint
+    _upload_attachment_send_message(message, data, endpoint)
+
+
+def _upload_attachment_send_message(message, data, api_endpoint):
     # Step 1, upload attachment
     attachment = upload_attachment()
+
+    if "error_string" in attachment.keys():
+        print("API error: %s" % attachment["error_string"])
+        return
 
     # Step 2, with the response from the attachment upload, send message
     print("Sending message '%s'" % message)
 
-    print(attachment)
+    data["content"] = message
+    data["attachments"] = json.dumps([attachment])
 
-    data = {
-        "conversation_id": conversation_id,
-        "content": message,
-        "attachments": json.dumps([attachment]),
-    }
-
-    print(data)
-
-    response = requests.post(
-        add_conversation_message_endpoint, data=data, headers=headers
-    )
+    response = requests.post(api_endpoint, data=data, headers=headers)
 
     print(response.text)
-
-
-upload_attachment_to_conversation("well hello")

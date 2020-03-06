@@ -2,83 +2,165 @@ package main
 
 import (
 	// "encoding/json"
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
+
+	"github.com/google/uuid"
+	"golang.org/x/oauth2"
 )
 
 const (
-	workspaceID    = 70829
-	conversationID = 494996
-	threadID       = 1389541
+	conversationID = "494996"
+	threadID       = "1389541"
 
-	attachmentEndpoint             string = "https://api.twist.com/api/v3/attachments/upload"
-	addConversationMessageEndpoint string = "https://api.twist.com/api/v3/conversation_messages/add"
-	addCommentThreadEndpoint       string = "https://api.twist.com/api/v3/comments/add"
+	attachmentEndpoint             = "https://api.twist.com/api/v3/attachments/upload"
+	addConversationMessageEndpoint = "https://api.twist.com/api/v3/conversation_messages/add"
+	addCommentThreadEndpoint       = "https://api.twist.com/api/v3/comments/add"
 )
 
 var (
-	bearerToken string
-	accessToken string
-)
-
-func init() {
+	// This access token will need to have "attachments:write, and either/both
+	// messages:write,comments:write" (depending on your usage) scopes
 	accessToken = os.Getenv("twist_token")
 	bearerToken = "Bearer " + accessToken
-}
+	httpClient  *http.Client
+)
 
 func main() {
+	if accessToken == "" {
+		fmt.Println("Invalid access token")
+		return
+	}
 
+	httpClient = oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(&oauth2.Token{
+		AccessToken: accessToken,
+		TokenType:   "Bearer",
+	}))
+
+	if err := uploadAttachmentToThread("Hello from Go"); err != nil {
+		fmt.Println(err.Error)
+	}
 }
 
-func uploadAttachment() string {
+func uploadAttachment() (string, error) {
 	var fileName = "image.jpg"
 	var attachmentID = uuid.New().String()
 
-	f, _ := ioutil.ReadFile(fileName)
 	// Read the file contents and do *something* with it
+	file, readFileError := os.Open(fileName)
+	if readFileError != nil {
+		return "", fmt.Errorf("Error reading file: %q", readFileError.Error)
+	}
+	defer file.Close()
 
-	data := url.Values{
-		"attachment_id": {attachmentID},
-		"file_name":     {fileName},
-		"file":          {f},
+	data := map[string]string{
+		"attachment_id": attachmentID,
+		"file_name":     fileName,
 	}
 
-	response, err := http.PostForm(attachmentEndpoint, data)
+	// Prepare the file for uploading
+	body := &bytes.Buffer{}
+	writer := multipart.NewWriter(body)
+
+	part, err := writer.CreateFormFile("file", fileName)
+
+	if err != nil {
+		return "", fmt.Errorf("Error adding file to request")
+	}
+
+	io.Copy(part, file)
+
+	for key, val := range data {
+		_ = writer.WriteField(key, val)
+	}
+
+	writer.Close()
+
+	request, requestError := http.NewRequest("POST", attachmentEndpoint, body)
+	if requestError != nil {
+		return "", fmt.Errorf("Error creating request: %q", requestError.Error)
+	}
+
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+
+	// Upload the file
+	response, err := httpClient.Do(request)
 
 	if err != nil {
 		fmt.Println("Error uploading attachment: ", err)
-		return ""
+		return "", err
 	}
 
-	json, _ := ioutil.ReadAll(response.Body)
+	jsonBytes, readError := ioutil.ReadAll(response.Body)
+
+	if readError != nil {
+		return "", fmt.Errorf("Error reading body: %q", readError.Error)
+	}
+
+	jsonString := string(jsonBytes)
+
+	// Check to see if the API has sent back any errors
+	if strings.Contains(jsonString, "error_string") {
+		var data map[string]interface{}
+		jsonError := json.Unmarshal(jsonBytes, &data)
+		fmt.Printf("Error uploading attachment: %q \n", data["error_string"])
+		return "", jsonError
+	}
 
 	// Return the JSON here as this will be needed
 	// when adding the attachment to the message
-	return string(json)
+	return jsonString, nil
 }
 
-func uploadAttachmentToConversation(message string) {
-	attachment := uploadAttachment()
+func uploadAttachmentToConversation(message string) error {
+	data := url.Values{
+		"conversation_id": {conversationID},
+	}
 
-	if attachment == "" {
-		return
+	return sendMessage(data, message, addConversationMessageEndpoint)
+}
+
+func uploadAttachmentToThread(message string) error {
+	data := url.Values{
+		"thread_id": {threadID},
+	}
+
+	return sendMessage(data, message, addCommentThreadEndpoint)
+}
+
+func sendMessage(
+	data url.Values,
+	message string,
+	apiEndpoint string) error {
+
+	attachment, err := uploadAttachment()
+
+	if err != nil {
+		return fmt.Errorf("Error from upload")
 	}
 
 	fmt.Println("Sending message '" + message + "'")
 
-	data := url.Values{
-		"conversation_id": {string(conversationID)},
-		"content":         {message},
-		"attachments":     {attachment},
+	data.Set("content", message)
+	data.Set("attachments", "["+attachment+"]")
+
+	response, responseError := httpClient.PostForm(apiEndpoint, data)
+
+	if responseError != nil {
+		return fmt.Errorf("Error posting to conversation: %q", responseError.Error)
 	}
 
-	response, _ := http.PostForm(addConversationMessageEndpoint, data)
+	_, readerError := io.Copy(os.Stdout, response.Body)
+	fmt.Println("")
 
-	json, _ := ioutil.ReadAll(response.Body)
-
-	fmt.Println(string(json))
+	return readerError
 }
