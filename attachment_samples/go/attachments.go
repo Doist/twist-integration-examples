@@ -20,6 +20,7 @@ import (
 const (
 	conversationID = "<<enter your conversation ID here>>"
 	threadID       = "<<enter your thread ID here>>"
+	fileName       = "image.jpg"
 
 	attachmentEndpoint             = "https://api.twist.com/api/v3/attachments/upload"
 	addConversationMessageEndpoint = "https://api.twist.com/api/v3/conversation_messages/add"
@@ -29,7 +30,7 @@ const (
 var (
 	// This access token will need to have "attachments:write, and either/both
 	// messages:write,comments:write" (depending on your usage) scopes
-	accessToken = os.Getenv("twist_token")
+	accessToken = os.Getenv("TWIST_TOKEN")
 	bearerToken = "Bearer " + accessToken
 	httpClient  *http.Client
 )
@@ -51,7 +52,6 @@ func main() {
 }
 
 func uploadAttachment() (string, error) {
-	var fileName = "image.jpg"
 	var attachmentID = uuid.New().String()
 
 	// Read the file contents and do *something* with it
@@ -84,7 +84,7 @@ func uploadAttachment() (string, error) {
 
 	writer.Close()
 
-	request, requestError := http.NewRequest("POST", attachmentEndpoint, body)
+	request, requestError := http.NewRequest(http.MethodPost, attachmentEndpoint, body)
 	if requestError != nil {
 		return "", fmt.Errorf("Error creating request: %q", requestError.Error)
 	}
