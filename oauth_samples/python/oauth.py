@@ -22,8 +22,8 @@ SCOPES = "<<enter the scopes your application requires>>"
 
 # client (application) credentials - located
 # at https://twist.com/integrations/build, then go to your integration
-CLIENT_ID = os.environ.get("twist_clientID")
-CLIENT_SECRET = os.environ.get("twist_clientSecret")
+CLIENT_ID = os.environ.get("TWIST_CLIENT_ID")
+CLIENT_SECRET = os.environ.get("TWIST_CLIENT_SECRET")
 
 # state, should be unique
 STATE = str(uuid.uuid1())

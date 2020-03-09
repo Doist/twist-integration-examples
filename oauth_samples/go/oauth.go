@@ -35,8 +35,8 @@ var (
 	state  = uuid.New().String()
 
 	// client (application) credentials - located at https://twist.com/integrations/build, then go to your integration
-	clientID     = os.Getenv("twist_clientID")
-	clientSecret = os.Getenv("twist_clientSecret")
+	clientID     = os.Getenv("TWIST_CLIENT_ID")
+	clientSecret = os.Getenv("TWIST_CLIENT_SECRET")
 )
 
 func main() {
@@ -62,16 +62,15 @@ func requestAuthorization() error {
 	fmt.Printf("-> ")
 
 	// Read the authorization code
-	text, readerError := reader.ReadString('\n')
+	text, err := reader.ReadString('\n')
 
-	if readerError != nil {
-		fmt.Println("Erorr reading the code you entered")
-		return readerError
+	if err != nil {
+		return fmt.Errorf("Erorr reading the code you entered")
 	}
 
-	requestToken(strings.TrimSuffix(text, "\n"))
+	err = requestToken(strings.TrimSuffix(text, "\n"))
 
-	return nil
+	return err
 }
 
 func requestToken(code string) error {
@@ -81,8 +80,7 @@ func requestToken(code string) error {
 	token, err := exchangeForToken(code)
 
 	if err != nil {
-		fmt.Println("Invalid token response")
-		return err
+		return fmt.Errorf("Invalid token response: %v", err)
 	}
 
 	// We can now use the access_token as much as we want to access protected resources.
@@ -90,23 +88,20 @@ func requestToken(code string) error {
 }
 
 func makeAPICall(token string) error {
-	var hc = http.DefaultClient
-	var bearer = "Bearer " + token
+	request, err := http.NewRequest("GET", apiURL, nil)
 
-	request, requestError := http.NewRequest("GET", apiURL, nil)
-
-	if requestError != nil {
-		fmt.Println("Error creating request")
-		return requestError
+	if err != nil {
+		return fmt.Errorf("Error creating request")
 	}
 
-	request.Header.Add("Authorization", bearer)
-	apiResp, responseError := hc.Do(request)
+	request.Header.Add("Authorization", "Bearer "+token)
+	apiResp, err := http.DefaultClient.Do(request)
 
-	if responseError != nil {
-		fmt.Println("Error making Authorization request")
-		return responseError
+	if err != nil {
+		return fmt.Errorf("Error making Authorization request")
 	}
+
+	defer apiResp.Body.Close()
 
 	if apiResp.StatusCode != http.StatusOK {
 		return fmt.Errorf("Unexpected respose %q", apiResp.Status)
@@ -116,10 +111,8 @@ func makeAPICall(token string) error {
 		return fmt.Errorf("Unsupported content-type: %q", ct)
 	}
 
-	defer apiResp.Body.Close()
-
-	_, readAllError := io.Copy(os.Stdout, apiResp.Body)
-	return readAllError
+	_, err = io.Copy(os.Stdout, apiResp.Body)
+	return err
 }
 
 func exchangeForToken(code string) (string, error) {
@@ -133,23 +126,25 @@ func exchangeForToken(code string) (string, error) {
 
 	authResp, err := http.PostForm(tokenURL, authData)
 
-	if authResp == nil {
-		fmt.Println("error: ", err)
-		return "", err
+	if err != nil {
+		return "", fmt.Errorf("error: ", err)
+	}
+
+	if authResp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected status: %q", authResp.Status)
 	}
 
 	fmt.Println("Access token requested")
 
 	var result oauth2.Token
 
-	body, readAllError := ioutil.ReadAll(authResp.Body)
+	body, err := ioutil.ReadAll(authResp.Body)
 
-	if readAllError != nil {
-		fmt.Println("Error reading the API call response")
-		return "", readAllError
+	if err != nil {
+		return "", fmt.Errorf("Error reading the API call response")
 	}
 
-	jsonError := json.Unmarshal(body, &result)
+	err = json.Unmarshal(body, &result)
 
-	return result.AccessToken, jsonError
+	return result.AccessToken, err
 }
