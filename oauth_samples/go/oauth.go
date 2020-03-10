@@ -127,7 +127,7 @@ func exchangeForToken(code string) (string, error) {
 	authResp, err := http.PostForm(tokenURL, authData)
 
 	if err != nil {
-		return "", fmt.Errorf("error: ", err)
+		return "", fmt.Errorf("error: %v", err)
 	}
 
 	if authResp.StatusCode != http.StatusOK {
