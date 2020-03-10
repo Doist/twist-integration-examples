@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
@@ -31,14 +31,12 @@ var (
 	// This access token will need to have "attachments:write, and either/both
 	// messages:write,comments:write" (depending on your usage) scopes
 	accessToken = os.Getenv("TWIST_TOKEN")
-	bearerToken = "Bearer " + accessToken
 	httpClient  *http.Client
 )
 
 func main() {
 	if accessToken == "" {
-		fmt.Println("Invalid access token")
-		return
+		log.Fatal("Invalid access token")
 	}
 
 	httpClient = oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(&oauth2.Token{
@@ -46,18 +44,18 @@ func main() {
 		TokenType:   "Bearer",
 	}))
 
-	if err := uploadAttachmentToThread("Hello from Go"); err != nil {
-		fmt.Println(err.Error)
+	if err := uploadAttachmentToThread("Hello from Go", fileName); err != nil {
+		log.Fatal(err)
 	}
 }
 
-func uploadAttachment() (string, error) {
+func uploadAttachment(fileName string) (json.RawMessage, error) {
 	var attachmentID = uuid.New().String()
 
 	// Read the file contents and do *something* with it
-	file, readFileError := os.Open(fileName)
-	if readFileError != nil {
-		return "", fmt.Errorf("Error reading file: %q", readFileError.Error)
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, fmt.Errorf("Error reading file: %v", err)
 	}
 	defer file.Close()
 
@@ -67,16 +65,22 @@ func uploadAttachment() (string, error) {
 	}
 
 	// Prepare the file for uploading
+	// NOTE: This will buffer the file into memory, if you try and do this
+	// with a large file, you may run into resource issues.
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
 	part, err := writer.CreateFormFile("file", fileName)
 
 	if err != nil {
-		return "", fmt.Errorf("Error adding file to request")
+		return nil, fmt.Errorf("Error adding file to request: %v", err)
 	}
 
-	io.Copy(part, file)
+	_, err = io.Copy(part, file)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error reading file: %v", err)
+	}
 
 	for key, val := range data {
 		_ = writer.WriteField(key, val)
@@ -84,9 +88,9 @@ func uploadAttachment() (string, error) {
 
 	writer.Close()
 
-	request, requestError := http.NewRequest(http.MethodPost, attachmentEndpoint, body)
-	if requestError != nil {
-		return "", fmt.Errorf("Error creating request: %q", requestError.Error)
+	request, err := http.NewRequest(http.MethodPost, attachmentEndpoint, body)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating request: %v", err)
 	}
 
 	request.Header.Add("Content-Type", writer.FormDataContentType())
@@ -95,71 +99,85 @@ func uploadAttachment() (string, error) {
 	response, err := httpClient.Do(request)
 
 	if err != nil {
-		fmt.Println("Error uploading attachment: ", err)
-		return "", err
+		return nil, err
 	}
 
-	jsonBytes, readError := ioutil.ReadAll(response.Body)
+	defer response.Body.Close()
 
-	if readError != nil {
-		return "", fmt.Errorf("Error reading body: %q", readError.Error)
+	// make sure we have an expected response code
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status: %q", response.Status)
 	}
 
-	jsonString := string(jsonBytes)
+	// make sure response has valid content-type
+	if ct := response.Header.Get("Content-Type"); ct != "application/json" {
+		return nil, fmt.Errorf("unsupported content-type: %q", ct)
+	}
 
-	// Check to see if the API has sent back any errors
-	if strings.Contains(jsonString, "error_string") {
-		var data map[string]interface{}
-		jsonError := json.Unmarshal(jsonBytes, &data)
-		fmt.Printf("Error uploading attachment: %q \n", data["error_string"])
-		return "", jsonError
+	jsonBytes, err := ioutil.ReadAll(io.LimitReader(response.Body, 1*1024*1024))
+
+	if err != nil {
+		return nil, fmt.Errorf("Error reading body: %v", err)
+	}
+
+	var jsonBody json.RawMessage
+	if err := json.Unmarshal(jsonBytes, &jsonBody); err != nil {
+		return nil, fmt.Errorf("response body json decode: %v", err)
+	}
+
+	// Check to make sure the API hasn't sent back any errors
+	tmp := struct {
+		ErrorText string `json:"error_string"`
+	}{}
+	if err := json.Unmarshal(jsonBytes, &tmp); err != nil {
+		return nil, err
+	}
+
+	if tmp.ErrorText != "" {
+		return nil, fmt.Errorf("upload attachment error from API: %q", tmp.ErrorText)
 	}
 
 	// Return the JSON here as this will be needed
 	// when adding the attachment to the message
-	return jsonString, nil
+	return jsonBody, nil
 }
 
-func uploadAttachmentToConversation(message string) error {
+func uploadAttachmentToConversation(message string, fileName string) error {
 	data := url.Values{
 		"conversation_id": {conversationID},
 	}
 
-	return sendMessage(data, message, addConversationMessageEndpoint)
+	return sendMessage(data, fileName, message, addConversationMessageEndpoint)
 }
 
-func uploadAttachmentToThread(message string) error {
+func uploadAttachmentToThread(message string, fileName string) error {
 	data := url.Values{
 		"thread_id": {threadID},
 	}
 
-	return sendMessage(data, message, addCommentThreadEndpoint)
+	return sendMessage(data, fileName, message, addCommentThreadEndpoint)
 }
 
-func sendMessage(
-	data url.Values,
-	message string,
-	apiEndpoint string) error {
-
-	attachment, err := uploadAttachment()
+func sendMessage(data url.Values, fileName string, message string, apiEndpoint string) error {
+	attachment, err := uploadAttachment(fileName)
 
 	if err != nil {
-		return fmt.Errorf("Error from upload")
+		return fmt.Errorf("Error from upload: %v", err)
 	}
 
-	fmt.Println("Sending message '" + message + "'")
+	fmt.Printf("Sending message '%q'", message)
 
 	data.Set("content", message)
-	data.Set("attachments", "["+attachment+"]")
+	data.Set("attachments", "["+string(attachment)+"]")
 
-	response, responseError := httpClient.PostForm(apiEndpoint, data)
+	response, err := httpClient.PostForm(apiEndpoint, data)
 
-	if responseError != nil {
-		return fmt.Errorf("Error posting to conversation: %q", responseError.Error)
+	if err != nil {
+		return fmt.Errorf("Error posting to conversation: %v", err)
 	}
 
-	_, readerError := io.Copy(os.Stdout, response.Body)
+	_, err = io.Copy(os.Stdout, response.Body)
 	fmt.Println("")
 
-	return readerError
+	return err
 }
