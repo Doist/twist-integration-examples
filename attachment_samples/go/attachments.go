@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,15 +13,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 
 	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 )
 
 const (
-	conversationID = "<<enter your conversation ID here>>"
-	threadID       = "<<enter your thread ID here>>"
-	fileName       = "../images/image.jpg"
+	fileName = "../images/image.jpg"
 
 	attachmentEndpoint             = "https://api.twist.com/api/v3/attachments/upload"
 	addConversationMessageEndpoint = "https://api.twist.com/api/v3/conversation_messages/add"
@@ -35,6 +35,12 @@ var (
 )
 
 func main() {
+	conversationID := flag.Int("conversation", 0, "Conversation ID for the file to be uploaded to")
+	threadID := flag.Int("thread", 0, "Thread ID for the file to be uploaded to")
+	message := flag.String("message", "", "The message to go with the attachment")
+	filePath := flag.String("filepath", fileName, "The relative path for the file to be uploaded")
+	flag.Parse()
+
 	if accessToken == "" {
 		log.Fatal("Invalid access token")
 	}
@@ -44,8 +50,26 @@ func main() {
 		TokenType:   "Bearer",
 	}))
 
-	if err := uploadAttachmentToThread("Hello from Go", fileName); err != nil {
-		log.Fatal(err)
+	conversationIDValue := *conversationID
+	threadIDValue := *threadID
+
+	if conversationIDValue != 0 || threadIDValue != 0 {
+		messageStr := *message
+		filePathStr := *filePath
+
+		if conversationIDValue != 0 {
+			fmt.Printf("Attempting to send to conversation: %v\n", conversationIDValue)
+			if err := uploadAttachmentToConversation(messageStr, filePathStr, conversationIDValue); err != nil {
+				log.Fatal(err)
+			}
+		} else if threadIDValue != 0 {
+			fmt.Printf("Attempting to send to thread: %v\n", threadIDValue)
+			if err := uploadAttachmentToThread(messageStr, filePathStr, threadIDValue); err != nil {
+				log.Fatal(err)
+			}
+		}
+	} else {
+		log.Fatal("Please supply either a conversation ID or a thread ID")
 	}
 }
 
@@ -142,17 +166,17 @@ func uploadAttachment(fileName string) (json.RawMessage, error) {
 	return jsonBody, nil
 }
 
-func uploadAttachmentToConversation(message string, fileName string) error {
+func uploadAttachmentToConversation(message string, fileName string, conversationID int) error {
 	data := url.Values{
-		"conversation_id": {conversationID},
+		"conversation_id": {strconv.Itoa(conversationID)},
 	}
 
 	return sendMessage(data, fileName, message, addConversationMessageEndpoint)
 }
 
-func uploadAttachmentToThread(message string, fileName string) error {
+func uploadAttachmentToThread(message string, fileName string, threadID int) error {
 	data := url.Values{
-		"thread_id": {threadID},
+		"thread_id": {strconv.Itoa(threadID)},
 	}
 
 	return sendMessage(data, fileName, message, addCommentThreadEndpoint)

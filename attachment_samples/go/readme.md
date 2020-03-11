@@ -7,7 +7,11 @@ You will also need to know the IDs of either/both a thread or a conversation.
 Once you've downloaded the sample folder simply run it:
 
 ```
-go run .
+go run . --conversation=1234 --message="hello there" --filepath="/relative/path/to/file"
 ```
 
-To determine which type of message (conversation/thread) should be posted, you should edit the `attachments.go` file and change the method call in `main()`
+or 
+
+```
+go run . --thread=4321 --message="hello there" --filepath="/relative/path/to/file"
+```
