@@ -20,7 +20,7 @@ import (
 const (
 	conversationID = "<<enter your conversation ID here>>"
 	threadID       = "<<enter your thread ID here>>"
-	fileName       = "image.jpg"
+	fileName       = "../images/image.jpg"
 
 	attachmentEndpoint             = "https://api.twist.com/api/v3/attachments/upload"
 	addConversationMessageEndpoint = "https://api.twist.com/api/v3/conversation_messages/add"

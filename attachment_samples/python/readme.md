@@ -4,11 +4,20 @@ This sample makes use of environment variables, please make sure you have variab
 
 You will also need to know the IDs of either/both a thread or a conversation.
 
-Once you've downloaded `attachment.py` and `client.py` simply import `attachments` and call one of the methods:
+Once you've downloaded `attachment.py` and `client.py` you can run it by running either of these commands:
+
+If you don't have [Click](http://click.pocoo.org/5/) installed, you will need to do this for the script to run
+```
+pip install click
+```
+
 
 ```
-python 
->>> import attachments as at
->>> at.upload_attachment_to_thread("hello from python", 123456)
->>> at.upload_attachment_to_conversation("hello from python", 654321)
+python attachments.py --thread=1234 --message="attached file" --filepath="./relative/path/to/file"
+```
+
+or 
+
+```
+python attachments.py --conversation=1234 --message="attached file" --filepath="./relative/path/to/file"
 ```

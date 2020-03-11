@@ -3,6 +3,7 @@
 import uuid
 import os
 import json
+import ntpath
 
 import requests
 
@@ -11,23 +12,25 @@ import requests
 ACCESS_TOKEN = os.environ.get("TWIST_TOKEN")
 ATTACHMENT_ENDPOINT = "https://api.twist.com/api/v3/attachments/upload"
 HEADERS = {"Authorization": "Bearer " + ACCESS_TOKEN}
-FILE_NAME = "image.jpg"
 
 
-def upload_attachment():
+def upload_attachment(filepath):
     """ Uploads the attachment and returns
      the json object of the attachment """
     print("Uploading attachment")
 
     attachment_id = str(uuid.uuid1())
 
-    image_file = open(FILE_NAME, "r")
+    try:
+        image_file = open(filepath, "r")
+    except IOError:
+        raise Exception("Error opening file")
 
     files = {"file": image_file}
 
     data = {
         "attachment_id": attachment_id,
-        "file_name": FILE_NAME,
+        "file_name": ntpath.basename(filepath),
     }
 
     response = requests.post(
@@ -40,12 +43,12 @@ def upload_attachment():
     return response.json()
 
 
-def upload_attachment_send_message(message, data, api_endpoint):
+def upload_attachment_send_message(message, data, api_endpoint, filepath):
     """This method performs the bulk of the operation and calls
     for the file to be uploaded, then sends the message to the
     relevant API with the user defined message"""
     # Step 1, upload attachment
-    attachment = upload_attachment()
+    attachment = upload_attachment(filepath)
 
     if "error_string" in attachment.keys():
         print("API error: %s" % attachment["error_string"])
