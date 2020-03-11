@@ -7,12 +7,12 @@ To run this script, ensure that you have python3 installed, and make sure you ha
 Then you can run the script with parameters:
 
 ```
-python3 action_button.py --message="films available" --button_text="book with cineworld" --action="open_url" --url="https://www.cinemachainsrus.co.uk" --conversation=123456
+python3 action_button.py --message="films available" --button_text="book at the cinema" --action="open_url" --url="https://www.cinemachainsrus.co.uk" --conversation=123456
 ```
 
 or
 ```
-python3 action_button.py --message="films available" --button_text="book with cineworld" --action="open_url" --url="https://www.cinemachainsrus.co.uk" --thread=654321
+python3 action_button.py --message="films available" --button_text="book at the cinema" --action="open_url" --url="https://www.cinemachainsrus.co.uk" --thread=654321
 ```
 
 To see all options available, please run `python3 action_button.py --help`
