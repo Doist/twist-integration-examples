@@ -36,7 +36,15 @@ ADD_COMMENT_THREAD_ENDPOINT = "https://api.twist.com/api/v3/comments/add"
 @click.option(
     "--button_message", help="The text to be prefilled/sent when the button is clicked"
 )
-def main(thread, conversation, message, action, url, button_text, button_message):
+def main(
+    thread: int,
+    conversation: int,
+    message: str,
+    action: str,
+    url: str,
+    button_text: str,
+    button_message: str,
+):
     if thread == 0 and conversation == 0:
         raise Exception("Please include either a thread id or a conversation id")
 
