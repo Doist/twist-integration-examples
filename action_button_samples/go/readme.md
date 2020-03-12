@@ -2,6 +2,8 @@
 
 This script allows you to add action buttons to either a conversation, or a thread (you can also add them when you create a new thread).
 
+This sample makes use of environment variables, please make sure you have variables configured for `TWIST_TOKEN` for this to work.
+
 You can run the script with parameters:
 
 ```
