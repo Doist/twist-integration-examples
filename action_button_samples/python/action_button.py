@@ -11,7 +11,8 @@ import os
 from typing import Dict
 import click
 
-
+# This access token will need to have either/both
+# messages:write,comments:write" (depending on your usage) scopes
 ACCESS_TOKEN = os.environ.get("TWIST_TOKEN")
 HEADERS: Dict[str, str] = {"Authorization": "Bearer " + ACCESS_TOKEN}
 
