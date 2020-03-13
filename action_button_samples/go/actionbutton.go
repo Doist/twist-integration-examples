@@ -65,10 +65,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if button == nil {
-		log.Fatal("Something went wrong with the button creation")
-	}
-
 	if threadID != 0 {
 		if err := addButtonToThread(messageStr, button, threadID); err != nil {
 			log.Fatal(err)
@@ -85,7 +81,7 @@ func addButtonToConversation(message string, button *Button, conversationID int)
 		"conversation_id": {strconv.Itoa(conversationID)},
 	}
 
-	return sendMessage(data, message, button, addConversationMessageEndpoint)
+	return sendMessage(data, message, addConversationMessageEndpoint, button)
 }
 
 func addButtonToThread(message string, button *Button, threadID int) error {
@@ -93,11 +89,11 @@ func addButtonToThread(message string, button *Button, threadID int) error {
 		"thread_id": {strconv.Itoa(threadID)},
 	}
 
-	return sendMessage(data, message, button, addCommentThreadEndpoint)
+	return sendMessage(data, message, addCommentThreadEndpoint, button)
 }
 
-func sendMessage(data url.Values, message string, button *Button, apiEndpoint string) error {
-	fmt.Printf("Sending message '%q'\n", message)
+func sendMessage(data url.Values, message, apiEndpoint string, button *Button) error {
+	fmt.Printf("Sending message %q\n", message)
 
 	actionJSON, err := json.Marshal(button)
 	if err != nil {
@@ -121,7 +117,7 @@ func sendMessage(data url.Values, message string, button *Button, apiEndpoint st
 	return err
 }
 
-func createButton(action string, buttonText string, url string, message string) (*Button, error) {
+func createButton(action, buttonText, url, message string) (*Button, error) {
 	if action != "open_url" && action != "prefill_message" && action != "send_reply" {
 		return nil, fmt.Errorf("You have not passed a valid action: %v", action)
 	}
