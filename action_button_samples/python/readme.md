@@ -4,7 +4,7 @@ This script allows you to add action buttons to either a conversation, or a thre
 
 This sample makes use of environment variables, please make sure you have variables configured for `TWIST_TOKEN` for this to work.
 
-To run this script, ensure that you have python3 installed, and make sure you have the Click module installed (`pip install click`).
+To run this script, ensure that you have python3 installed, and make sure you have installed the requirements (`pip install -r requirements.txt`).
 
 Then you can run the script with parameters:
 

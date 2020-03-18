@@ -97,10 +97,8 @@ def create_action_button(
         "button_text": button_text,
     }
 
-    if (
-        not action == "open_url"
-        and not action == "prefill_message"
-        and not action == "send_reply"
+    if not (
+        action == "open_url" or action == "prefill_message" or action == "send_reply"
     ):
         raise Exception("you have not passed a valid action: %s" % action)
 
@@ -109,7 +107,7 @@ def create_action_button(
             raise Exception("url should be set when using 'open_url'")
         button["url"] = url
     else:
-        if message == "" or message is None:
+        if not message:
             raise Exception("message cannot be empty")
         button["message"] = message
 
