@@ -50,3 +50,4 @@ FLASK_APP=server.py flask run
 ```
 
 With that complete, you can now go to a conversation with the bot and type something like "hello bot" and it will reply to you.
+![](../images/bot_chat.jpg)
