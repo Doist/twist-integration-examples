@@ -3,7 +3,7 @@
 This is a code sample demonstrating how to perform a long running task when dealing with bots in Twist.
 
 To run this sample we will need to setup and configure a few things:
-- ngrok to forward the Twist calls to your local server
+- [ngrok](https://ngrok.com/) to forward the Twist calls to your local server
 - An integration on Twist
 - A Flask server to run the server code
 
