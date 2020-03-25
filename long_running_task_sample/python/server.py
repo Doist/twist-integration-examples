@@ -66,7 +66,20 @@ def create_message_response(form_data):
 
 def send_reply(url_callback, message):
     payload = {"content": message}
-    requests.post(url_callback, data=payload)
+    response = requests.post(url_callback, data=payload)
+
+    response_json = response.json()
+    if "error_string" in response_json.keys():
+        print("API error: %s" % response_json["error_string"])
+        return
+    else:
+        if response.status_code == 200:
+            print("Message sent successfully")
+        else:
+            print(
+                "There was an error posting the message, status code: %s",
+                response.status_code,
+            )
 
 
 def url_has_timed_out(url_ttl):
