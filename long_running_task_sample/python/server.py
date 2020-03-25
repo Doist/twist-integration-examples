@@ -21,8 +21,6 @@ def message_received():
     if event_type == "ping":
         return Response("pong")
 
-    print(request_data)
-
     # Here we pass the processing of the message off to a background thread
     # We do this so that we can immediately respond to the message to
     # acknowledge we've received it

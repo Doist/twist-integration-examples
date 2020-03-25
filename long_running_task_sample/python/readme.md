@@ -35,7 +35,7 @@ Once all that is done and saved, click on `Installation`, make sure you are in t
 
 ## Setup Flask to run as server
 
-Now, before your integration will work, you need to have that server up and running. 
+Before your integration will work, you need to have a server up and running. 
 
 We're using Flask in this example, but you can use any other setup you're more familiar with. 
 
