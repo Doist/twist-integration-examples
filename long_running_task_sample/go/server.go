@@ -16,7 +16,6 @@ func main() {
 }
 
 func botHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("botHandler")
 	// Because the Twist API will only send this data via POST,
 	// we can discard any calls to this endpoint that aren't POST
 	if r.Method != "POST" {
@@ -25,7 +24,7 @@ func botHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := r.ParseForm(); err != nil {
-		fmt.Fprintf(w, "ParseForm() error: %v", err)
+		log.Print("ParseForm() error: ", err)
 		http.Error(w, "Error reading form parts", http.StatusBadRequest)
 		return
 	}
@@ -47,12 +46,9 @@ func botHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusAccepted)
-
-	fmt.Println("Response header written")
 }
 
 func processBotConversation(r url.Values) {
-	fmt.Printf("processBotConversation, messageID: %s\n", r.Get("message_id"))
 	callbackURL := r.Get("url_callback")
 	urlTTL := r.Get("url_ttl")
 
@@ -69,7 +65,6 @@ func processBotConversation(r url.Values) {
 }
 
 func createMessageResponse(r url.Values) string {
-	fmt.Println("createMessageResponse")
 	content := strings.ToUpper(r.Get("content"))
 	fmt.Printf("Content: %s\n", content)
 	var message = "I didn't understand that, please type 'help' to see how to use this bot"
@@ -79,6 +74,8 @@ func createMessageResponse(r url.Values) string {
 		userName := r.Get("user_name")
 		message = fmt.Sprintf("Hello, %s", userName)
 
+		// This is here to purely demonstrate that a bot's response could take a while, thus
+		// why this sample is showing how to use the url_callback approach.
 		time.Sleep(11 * time.Second)
 	} else if content == "HELP" {
 		message = "This sample allows you to say 'hi' or 'hello' to the bot"
@@ -88,12 +85,16 @@ func createMessageResponse(r url.Values) string {
 }
 
 func sendReply(callbackURL, message string) error {
-	fmt.Println("sendReply")
 	data := url.Values{
 		"content": {message},
 	}
 
-	_, err := http.DefaultClient.PostForm(callbackURL, data)
+	response, err := http.DefaultClient.PostForm(callbackURL, data)
+
+	if err == nil {
+		defer response.Body.Close()
+	}
+
 	return err
 }
 
