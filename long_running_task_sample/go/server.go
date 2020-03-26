@@ -60,13 +60,13 @@ func processBotConversation(r url.Values) {
 
 	err := sendReply(callbackURL, message)
 	if err != nil {
-		fmt.Printf("Error sending reply: %v", err)
+		log.Print("Error sending reply: %v", err)
 	}
 }
 
 func createMessageResponse(r url.Values) string {
 	content := strings.ToUpper(r.Get("content"))
-	fmt.Printf("Content: %s\n", content)
+	log.Print("Content: %s\n", content)
 	var message = "I didn't understand that, please type 'help' to see how to use this bot"
 
 	if strings.HasPrefix(content, "HELLO") ||
