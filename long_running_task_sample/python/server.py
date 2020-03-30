@@ -7,6 +7,8 @@ from threading import Thread
 app = Flask(__name__)
 app.debug = True
 
+GREETINGS = ["HI", "HELLO", "HEY"]
+
 
 @app.route("/bot", methods=["POST"])
 def message_received():
@@ -16,7 +18,7 @@ def message_received():
 
     # It's good practice with Twist integrations to support being
     # pinged, it's a good way to test that your integration is
-    # successfully talking to twist. This ping is done from the bot
+    # successfully talking to Twist. This ping is done from the bot
     # section of the integration's configuration
     if event_type == "ping":
         return Response("pong")
@@ -28,6 +30,10 @@ def message_received():
     thr.start()
 
     # This tells the server we've received the message ok
+    # Optionally, you can also respond with some message text, this
+    # text would then be displayed as a message to the user who sent
+    # it. This message could be to say that the bot is handling their
+    # request
     return "", 202
 
 
@@ -35,13 +41,17 @@ def process_bot_conversation(form_data):
     url_callback = form_data.get("url_callback")
     url_ttl = form_data.get("url_ttl")
 
+    message = create_message_response(form_data)
+
     # We need to check whether the callback url has timed out, we
     # give you 30 minutes in order to send your message, after which
     # the callback url will have expired
     if url_has_timed_out(url_ttl):
+        print(
+            "URL for responding has timed out, message id: %s"
+            % form_data.get("message_id")
+        )
         return
-
-    message = create_message_response(form_data)
 
     send_reply(url_callback, message)
 
@@ -53,7 +63,11 @@ def create_message_response(form_data):
     current_content = form_data.get("content")
     message = "I didn't understand that please type 'help' to see how to use this bot"
 
-    if current_content.startswith("hello") or current_content.startswith("hi"):
+    greeting = next(
+        (x for x in GREETINGS if current_content.upper().startswith(x)), "none"
+    )
+
+    if not greeting == "none":
         user_name = form_data.get("user_name")
         message = u"Hello %s!" % (user_name)
         time.sleep(5)
