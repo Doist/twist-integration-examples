@@ -1,6 +1,6 @@
 # Long Running Task Go Sample
 
-This is a code sample demonstrating how to perform a long running task when dealing with bots in Twist.
+This is a code sample demonstrating how to perform a long running task when dealing with [bots](https://developer.twist.com/v3/#bot) in Twist. The purpose of this is to show that bots can respond in a timely manor and avoid hitting the timeout restriction of 10 seconds, regardless of what your bot actually needs to do in the background.
 
 To run this sample we will need to setup and configure a few things:
 - [ngrok](https://ngrok.com/) to forward the Twist calls to your local server
@@ -17,7 +17,7 @@ ngrok http 5000
 ```
 
 This will start a session that points to port 5000.
-![](../images/ngrok.jpg)
+![ngrok running screen](../images/ngrok.jpg)
 
 Make a note of the second forwarding URL (in the example, https://4ecc43da.ngrok.io) as we will need this in the next step.
 
@@ -27,7 +27,7 @@ To create your integration, go to https://twist.com/integrations/build and click
 
 Once you've given it a name and a description, press `Create my integration`; for this sample we will mainly look at Bots. If you go to the Bot section, enter the details of your bot like below
 
-![](../images/bot_config.jpg)
+![Bot configuration settings](../images/bot_config.jpg)
 
 It's here you need that ngrok URL from earlier, enter that into the Request URL with `/bot` at the end as that's the endpoint we are using in the code. Your integration may be different.
 

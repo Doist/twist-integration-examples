@@ -33,7 +33,7 @@ func botHandler(w http.ResponseWriter, r *http.Request) {
 
 	// It's good practice with Twist integrations to support being
 	// pinged, it's a good way to test that your integration is
-	// successfully talking to twist. This ping is done from the bot
+	// successfully talking to Twist. This ping is done from the bot
 	// section of the integration's configuration
 	if eventType == "ping" {
 		w.Write([]byte("pong"))
@@ -44,6 +44,11 @@ func botHandler(w http.ResponseWriter, r *http.Request) {
 		processBotConversation(r.PostForm)
 	}()
 
+	// This tells the server we've received the message ok
+	// Optionally, you can also respond with some message text, this
+	// text would then be displayed as a message to the user who sent
+	// it. This message could be to say that the bot is handling their
+	// request
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusAccepted)
 }
