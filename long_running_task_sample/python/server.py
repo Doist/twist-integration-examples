@@ -70,6 +70,10 @@ def create_message_response(form_data):
     if not greeting == "none":
         user_name = form_data.get("user_name")
         message = u"Hello %s!" % (user_name)
+
+        # This is here to purely demonstrate that a bot's response could
+        # take a while, thus why this sample is showing how to use the
+        # url_callback approach.
         time.sleep(5)
 
     elif current_content == "help":
