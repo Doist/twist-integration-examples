@@ -18,17 +18,6 @@ Examples
 ### Go
 * [GitHub issue -> Twist thread](channel_integration/go/)
 
-## Slash Integration
-
-### Python
-* [Appear.in slash integration](slash_integration/python/)
-
-### Node
-* [Appear.in slash integration](slash_integration/node/)
-
-### Go
-* [Appear.in slash integration](slash_integration/go/)
-
 ## Bot Integration
 
 ### Node
