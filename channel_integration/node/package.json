@@ -10,7 +10,7 @@
   "author": "Paul Halliday <hello@paulhalliday.io> (https://paulhalliday.io/)",
   "license": "MIT",
   "dependencies": {
-    "axios": "0.21.1",
+    "axios": "0.21.2",
     "body-parser": "1.18.2",
     "express": "4.16.2"
   }
